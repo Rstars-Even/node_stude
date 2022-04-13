@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 //引入各种路由对象。。
 const indexRouter = require('./routes/index')
+const passportRouter = require('./routes/passport')
 
 
 // let appConfig = app => {       //以函数的方式调用。。
@@ -60,6 +61,7 @@ class AppConfig{    //以面向对象的方式抽取。。推荐使用。
         }))
         //注册路由到 app 下。
         this.app.use(indexRouter)
+        this.app.use(passportRouter)
     }
 }
 module.exports = AppConfig;
