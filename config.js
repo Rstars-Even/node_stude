@@ -61,7 +61,7 @@ class AppConfig{    //以面向对象的方式抽取。。推荐使用。
         }))
         //注册路由到 app 下。
         this.app.use(indexRouter)
-        this.app.use(passportRouter)
+        this.app.use(passportRouter)    //验证码路由。。
     }
 }
 module.exports = AppConfig;
