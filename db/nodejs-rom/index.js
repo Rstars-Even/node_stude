@@ -1,8 +1,8 @@
 const mysql = require('mysql');
 // 数据库连接设置
 let orm_config = {
-    host: 'localhost',//数据库地址
-    // host: '192.168.5.154',//数据库地址
+    // host: 'localhost',//数据库地址
+    host: '192.168.5.154',//数据库地址
     port:'3306',
     user: 'root',//用户名，没有可不填
     password: '123456',//密码，没有可不填
