@@ -7,7 +7,6 @@ async function handleDB(res, tableName, methodName, errMsg, n1, n2) {
     //如果查询失败：result 接收 err。
     try {
         result = await new Promise((resolve, reject) => {
-            
             if (!n1) {
                 //没有传n1
                 Model[methodName]((err, data) => {
