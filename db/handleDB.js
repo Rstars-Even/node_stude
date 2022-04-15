@@ -1,4 +1,4 @@
-const db = require('./nodejs-rom')
+const db = require('./nodejs-orm')
 
 async function handleDB(res, tableName, methodName, errMsg, n1, n2) {
     let Model = db.model(tableName);
