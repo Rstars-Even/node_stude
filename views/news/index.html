@@ -97,7 +97,9 @@
             </div>
             <ul class="rank_list">
                 {{ each newsClick}}
-                    <li><span class="first">{{$index+1}}</span><a href="#">{{$value.title}}</a></li>
+                    <li><span class={{ $index | classNameFilter }}>{{$index+1}}</span><a href="#">{{$value.title}}</a></li>
+                    <!-- 以下是一种方法，也可以使用上面的模板过滤器。。 -->
+                    <!-- <li><span class={{ $index==0?"first":$index==1?"second":$index==2?"third":""}}>{{$index+1}}</span><a href="#">{{$value.title}}</a></li> -->
                 {{ /each}}
                 <!-- <li><span class="first">1</span><a href="#">势如破竹！人民币再度连闯四道关口 在岸、离岸双双升破6.42</a></li>
                 <li><span class="second">2</span><a href="#">凛冬已至，还有多少银行人在假装干银行</a></li>
