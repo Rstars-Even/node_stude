@@ -97,7 +97,7 @@
             </div>
             <ul class="rank_list">
                 {{ each newsClick}}
-                    <li><span class={{ $index | classNameFilter }}>{{$index+1}}</span><a href="#">{{$value.title}}</a></li>
+                    <li><span class={{ $index | classNameFilter }}>{{$index+1}}</span><a href="/news_detail/{{$value.id}}">{{$value.title}}</a></li>
                     <!-- 以下是一种方法，也可以使用上面的模板过滤器。。 -->
                     <!-- <li><span class={{ $index==0?"first":$index==1?"second":$index==2?"third":""}}>{{$index+1}}</span><a href="#">{{$value.title}}</a></li> -->
                 {{ /each}}

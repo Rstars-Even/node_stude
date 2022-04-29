@@ -39,4 +39,31 @@ router.get('/', (req, res) => {
 })
 
 
+router.get("/news_list", (req, res) => {
+    (async function(){
+        // 1.获取参数   cid（新闻分类id）   page（当前页数）    per_page(每页条数)
+        let {cid = 1, page = 1, per_page =5} = req.query;   //分别给参数设置默认值。
+        
+        // 2.查询数据库，根据以上三个参数，获取前端需要这些数据。
+        let wh = cid == 1 ? "1" : `category_id=${cid}`;
+        let result = await handleDB(res, "info_news", "limit", "数据库查询出错！", {
+            where: `${wh} order by create_time desc`,
+            number: page,
+            count: per_page
+        })
+
+        // 求总页数totalPage
+        // 总页数 = 总条数/每页有多少条     结果应该向上取整 Math.ceil()
+        let result2 = await handleDB(res, "info_news", "sql", "数据库查询出错", "select count(*) from info_news where " + wh)   //计算总条数。
+        let totalPage = Math.ceil(result2[0]["count(*)"]/per_page)
+        // console.log("result---------------------->>>>", result);
+        res.send({
+            newsList: result,
+            totalPage,
+            currentPage: Number(page)
+        })
+    })()
+})
+
+
 module.exports = router;

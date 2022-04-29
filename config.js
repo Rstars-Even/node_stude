@@ -8,6 +8,7 @@ const common = require('./utils/common')
 //引入各种路由对象。。
 const indexRouter = require('./routes/index')
 const passportRouter = require('./routes/passport')
+const detailRouter = require('./routes/detail')
 const keys = require('./keys')
 
 
@@ -68,6 +69,7 @@ class AppConfig{    //以面向对象的方式抽取。。推荐使用。
         //注册路由到 app 下。
         this.app.use(common.csrfProtect, indexRouter)
         this.app.use(common.csrfProtect, passportRouter)    //验证码路由。。
+        this.app.use(common.csrfProtect, detailRouter)    //文章路由。。
     }
 }
 module.exports = AppConfig;

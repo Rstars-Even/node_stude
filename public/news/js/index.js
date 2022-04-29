@@ -46,19 +46,19 @@ $(function () {
         if ((canScrollHeight - nowScroll) < 100) {
             // TODO 判断页数，去更新新闻数据
 
-            // if (!is_data_querying) {
-            //     // 将`是否正在向后端查询新闻数据`的标志设置为真
-            //     // 防止页面滚动时多次向服务器请求数据
-            //     is_data_querying = true;
-            //     // 判断是否还有`下一页`，如果有则继续 '请求获取' '下一页'内容
-            //     if (cur_page < total_page) {
-            //         // 获取下一页的数据，所以需要当前页码+1
-            //         cur_page+=1
-            //         updateNewsData();
-            //     }else {
-            //         is_data_querying = false;
-            //     }
-            // }
+            if (!is_data_querying) {
+                // 将`是否正在向后端查询新闻数据`的标志设置为真
+                // 防止页面滚动时多次向服务器请求数据
+                is_data_querying = true;
+                // 判断是否还有`下一页`，如果有则继续 '请求获取' '下一页'内容
+                if (cur_page < total_page) {
+                    // 获取下一页的数据，所以需要当前页码+1
+                    cur_page+=1
+                    updateNewsData();
+                }else {
+                    is_data_querying = false;
+                }
+            }
         }
     })
 })
@@ -72,15 +72,15 @@ function updateNewsData() {
     }
     //开始请求，将is_data_querying设置为true
     is_data_querying = true;
-/*
+
     $.get("/news_list", params, function (resp) {
-        设置 `数据正在查询数据` 变量为 false，以便下次上拉加载
+        // 设置 `数据正在查询数据` 变量为 false，以便下次上拉加载
 
         if (resp) {
 
             // 先清空原有数据
             if(cur_page == 1){
-                $(".list_con").news('')
+                $(".list_con").html('')
             }
 
             // 显示数据
@@ -109,5 +109,5 @@ function updateNewsData() {
             alert(resp.errmsg);
         }
     })
-*/
+
 }
