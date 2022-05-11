@@ -6,7 +6,8 @@ let orm_config = {
     port:'3306',
     user: 'root',//用户名，没有可不填
     password: '123456',//密码，没有可不填
-    database: 'study-test'//数据库名称
+    database: 'study-test',//数据库名称
+    useConnectionPooling: true
 }
 
 let options = {};
@@ -337,6 +338,13 @@ let orm = {
         return new Model(name, options);
     }
 };
+
+setInterval(function () {
+    connection.query('SELECT 1');
+    console.log("数据库准备完成")
+}, 5000);
+
+
 
 orm.connect(orm_config);
 

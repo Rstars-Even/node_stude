@@ -1,4 +1,5 @@
 // 这里放一些公共的工具。。
+const handleDB = require('../db/handleDB')
 
 function csrfProtect(req, res, next){   //设置 token 防止csrf。。
     // 这里的代码什么时候执行？？
@@ -33,6 +34,22 @@ function getRandomString(n) {       //生成 csrf-token 的函数。。。
     return str.substr(str.length - n);
 }
 
+
+//获取用户信息函数。。
+async function getUser(req, res) {
+    //访问首页，处理右上角用户登录显示。根据用户登录状态信息。
+    //从 session 中获取 user_id 
+    let user_id = req.session["user_id"];
+    let result = [];
+    if (user_id) {  
+        //如果已经获取到 user_id ,要确认这个 user_id 是有效的。
+        //如果有效就要查询出数据，给到模板或前端。
+        result = await handleDB(res, "info_user", "find", "查询数据库出错！", `id=${user_id}`);        
+    }
+    return result;        
+}
+
 module.exports = {
-    csrfProtect
+    csrfProtect,
+    getUser
 }

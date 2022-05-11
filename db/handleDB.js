@@ -34,7 +34,7 @@ async function handleDB(res, tableName, methodName, errMsg, n1, n2) {
 
     } catch (err) {
         console.log(err);
-        res.send(errmsg, err);
+        res.send(errMsg, err);
         return
     }
 

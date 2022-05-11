@@ -2,20 +2,16 @@ const express = require('express');
 const router = express.Router();
 const handleDB = require('../db/handleDB')
 require('../utils/filter')
+const common = require('../utils/common')
+
 
 router.get('/', (req, res) => {
-    //访问首页，处理右上角用户登录显示。根据用户登录状态信息。
-    //从 session 中获取 user_id 
     (async () => {
-
-        let user_id = req.session["user_id"];
-        let result = [];
-        if (user_id) {  
-            //如果已经获取到 user_id ,要确认这个 user_id 是有效的。
-            //如果有效就要查询出数据，给到模板或前端。
-            result = await handleDB(res, "info_user", "find", "查询数据库出错！", `id=${user_id}`);        
-        }
-        console.log("用户信息查询结果------->>", result);
+        
+        //访问首页，处理右上角用户登录显示。根据用户登录状态信息。
+        //从 session 中获取 user_id 
+        let userInfo = await common.getUser(req, res);
+        console.log("用户信息查询结果------->>", userInfo);
         
         //--------------------------------------------------------------------
         //展示首页头部分类信息。
@@ -27,9 +23,9 @@ router.get('/', (req, res) => {
         let result3 = await handleDB(res, "info_news", "find", "查询数据库出错！", "1 order by clicks desc limit 6");
 
         let data = {    //把用户信息传递到模板。。
-            user_info: result[0] ? {
-                nick_name: result[0].nick_name,
-                avatar_url: result[0].avatar_url
+            user_info: userInfo[0] ? {
+                nick_name: userInfo[0].nick_name,
+                avatar_url: userInfo[0].avatar_url
             } : false,
             category: result2,
             newsClick: result3

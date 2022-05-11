@@ -1,5 +1,4 @@
 const express = require('express');
-const https = require('https');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -70,6 +69,21 @@ class AppConfig{    //以面向对象的方式抽取。。推荐使用。
         this.app.use(common.csrfProtect, indexRouter)
         this.app.use(common.csrfProtect, passportRouter)    //验证码路由。。
         this.app.use(common.csrfProtect, detailRouter)    //文章路由。。
+
+        this.app.use((req, res) => {
+            (async function () {
+                //在获取登录用户的信息。
+                let userInfo = await common.getUser(req, res);
+
+                let data = {
+                    user_info: userInfo[0] ? {
+                        nick_name: userInfo[0].nick_name,
+                        avatar_url: userInfo[0].avatar_url
+                    } : false,
+                }
+                res.render('news/404', data);
+            })();
+        })
     }
 }
 module.exports = AppConfig;
