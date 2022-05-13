@@ -19,16 +19,10 @@ router.get('/news_detail/:news_id', (req, res) => {
         let newsResult = await handleDB(res, "info_news", "find", "查询数据库出错！", `id=${news_id}`);
         // console.log("newResult-------", newsResult);
         
-        //确保数据有 id 为 news_id 这篇新闻，才可以继续往下执行。
+        //确保数据有 id 为 news_id 这篇新闻，才可以继续往下执行。如果没有这篇新闻则返回404页面。
         if (!newsResult[0]) {
 
-            let data = {
-                user_info: userInfo[0] ? {
-                    nick_name: userInfo[0].nick_name,
-                    avatar_url: userInfo[0].avatar_url
-                } : false,
-            }
-            res.render("news/404", data);
+            common.abort404(req, res);
             return;
         }
 

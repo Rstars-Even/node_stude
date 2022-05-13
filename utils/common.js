@@ -49,7 +49,20 @@ async function getUser(req, res) {
     return result;        
 }
 
+//抛出404页面。
+async function abort404(req, res) {
+    let userInfo = await getUser(req, res);
+    let data = {    //把用户信息传递到模板。。
+        user_info: userInfo[0] ? {
+            nick_name: userInfo[0].nick_name,
+            avatar_url: userInfo[0].avatar_url
+        } : false,
+    }
+    res.render('news/404', data);
+}
+
 module.exports = {
     csrfProtect,
-    getUser
+    getUser,
+    abort404
 }
