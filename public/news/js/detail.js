@@ -5,6 +5,7 @@ function getCookie(name) {
 
 
 $(function(){
+    updateCommentCount()
     // 打开登录框
     $('.comment_form_logout').click(function () {
         $('.login_form_con').show();
@@ -12,7 +13,7 @@ $(function(){
 
     // 收藏
     $(".collection").click(function () {
-        /*
+        
         //获取到新闻编号
         var news_id = $(".collection").attr('data-newid');
         var action = "collect"
@@ -42,12 +43,12 @@ $(function(){
                 }
             }
         })
-       */
+       
     })
 
     // 取消收藏
     $(".collected").click(function () {
-      /*
+      
         var news_id = $(".collected").attr('data-newid');
         var action = "cancel_collect"
         var params = {
@@ -76,7 +77,7 @@ $(function(){
                 }
             }
         })
-     */
+     
     })
 
         // 评论提交
@@ -94,7 +95,7 @@ $(function(){
                 "news_id": news_id,
                 "comment": news_comment
             };
-            /*
+            
             $.ajax({
                 url: "/news_detail/news_comment",
                 type: "post",
@@ -105,6 +106,7 @@ $(function(){
                 data: JSON.stringify(params),
                 success: function (resp) {
                     if (resp.errno == '0') {
+                        console.log("返回结果！！！", resp)
                         var comment = resp.data
                         // 拼接内容
                         var comment_html = ''
@@ -145,7 +147,7 @@ $(function(){
                     }
                 }
             })
-*/
+
 
     })
 
