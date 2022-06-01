@@ -42,7 +42,30 @@ router.get('/news_detail/:news_id', (req, res) => {
 
         //查询和这篇新闻相关的评论。格式：[{},{},...],以创建时间降序排序。
         let commentResult = await handleDB(res, "info_comment", "find", "查询数据库出错！", `news_id=${news_id} order by create_time desc`);
-        console.log("commentResult", commentResult);
+        // console.log("commentResult--------------->>>", commentResult);
+
+        //给 commentResult 数组中每一个元素（每一条评论）进行处理，添加评论者的信息。
+        for (let index = 0; index < commentResult.length; index++) {
+            //查询数据库，查询 info_user 表中对应的玩家信息。根据 commentResult[i] 中的 user_id 属性来查询。
+            let commenterResult = await handleDB(res, "info_user", "find", "查询数据库出错！", `id=${commentResult[index].user_id}`);
+            commentResult[index].commenter = {
+                nick_name: commenterResult[0].nick_name,
+                avatar_url: commenterResult[0].avatar_url?userInfo[0].avatar_url:"/news/images/worm.jpg"
+            }
+
+            //如果commentResult[index].parent_id 有这个值就添加 parent 这个属性。
+            if (commentResult[index].parent_id) {
+                //如果有回复，查询父评论的内容 contrnt(info_comment),和父评论名（info_user）的昵称 nick_name
+                var parentComment = await handleDB(res, "info_comment", "find", "数据库查询失败！", `id=${commentResult[index].parent_id}`)
+                var parentUserInfo = await handleDB(res, "info_user", "find", "数据库查询失败！", `id=${parentComment[0].user_id}`)
+                commentResult[index].parent = {
+                    user: {
+                        nick_name: parentUserInfo[0].nick_name,
+                    },
+                    content: parentComment[0].comment
+                }
+            }
+        }
 
         let data = {    //把用户信息传递到模板。。
             user_info: userInfo[0] ? {
@@ -89,7 +112,7 @@ router.post('/news_detail/news_collect', (req, res) => {
                 user_id: userInfo[0].id,
                 news_id
             })
-        } else {
+        } else {    //取消收藏操作。。
             await handleDB(res, "info_user_collection", "delete", "数据库删除失败！", `user_id=${userInfo[0].id} and news_id=${news_id}`);
         }
         // 5.返回操作成功
@@ -126,22 +149,34 @@ router.post('/news_detail/news_comment', (req, res) => {
             content: comment,
             create_time: new Date().toLocaleString()
         }
-        if (parent_id) {    //如果 parent_id 有值就设置这个属性。
+        if (parent_id) {    //如果 parent_id 有值就设置这个属性。说明是回复
             commentObj.parent_id = parent_id;
+
+            //如果有回复，查询父评论的内容 contrnt(info_comment),和父评论名（info_user）的昵称 nick_name
+            var parentComment = await handleDB(res, "info_comment", "find", "数据库查询失败！", `id=${parent_id}`)
+            var parentUserInfo = await handleDB(res, "info_user", "find", "数据库查询失败！", `id=${parentComment[0].user_id}`)
         }
         console.log("评论数据------------------------>>", commentObj)
         let insertResule = await handleDB(res, "info_comment", "insert", "数据库插入失败！", commentObj);
         // 5.返回成功的响应（传数据给前端到回调函数中，让其去拼接评论的信息。）
+        // console.log("parentComment[0]:", parentComment[0])
         let data = {
             user: {
                 avatar_url: userInfo[0].avatar_url?userInfo[0].avatar_url:"/news/images/worm.jpg",
                 nick_name: userInfo[0].nick_name
             },
             content: comment,
-            create_time: comment.created_time,
+            create_time: commentObj.create_time,
             news_id,
             id: insertResule.insertId,
+            parent: parent_id?{     //是否传有 parent_id
+                user: {
+                    nick_name: parentUserInfo[0].nick_name,
+                },
+                content: parentComment[0].content,
+            }:null
         }
+        // console.log("data----------------->>>", data);
         res.send({errno: "0", errmsg: "操作成功！", data})
 
     })();

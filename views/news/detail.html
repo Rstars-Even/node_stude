@@ -42,9 +42,9 @@
         {{ each commentList }}
             <div class="comment_list">
                 <div class="person_pic fl">
-                    <img src="{{ user_info.avatar_url }}" alt="用户图标">
+                    <img src="{{ $value.commenter.avatar_url }}" alt="用户图标">
                 </div>
-                <div class="user_name fl">{{ user_info.nick_name }}</div>
+                <div class="user_name fl">{{ $value.commenter.nick_name }}</div>
                 <div class="comment_text fl">{{ $value.content }}</div>
                 {{ if $value.parent_id }}
                     <div class="reply_text_con fl">
