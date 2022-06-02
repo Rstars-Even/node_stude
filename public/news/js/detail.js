@@ -170,7 +170,6 @@ $(function(){
         // 点赞处理
         if(sHandler.indexOf('comment_up')>=0)
         {
-            /*
             var $this = $(this);
             var action = "add"
             if(sHandler.indexOf('has_comment_up')>=0)
@@ -218,9 +217,9 @@ $(function(){
                         // 更新点赞数据,重新赋值回去
                         $this.attr('data-likecount', like_count)
                         if (like_count == 0) {
-                            $this.news("赞")
+                            $this.html("赞")
                         }else {
-                            $this.news(like_count)
+                            $this.html(like_count)
                         }
                     }else if (resp.errno == "4101"){
                         $('.login_form_con').show();
@@ -229,7 +228,6 @@ $(function(){
                     }
                 }
             })
-            */
         }
 
         // 评论回复

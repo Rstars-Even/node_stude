@@ -67,6 +67,17 @@ router.get('/news_detail/:news_id', (req, res) => {
             }
         }
 
+        //把登陆用户的点赞过的评论全部查出来，组成：["id1", "id2", ...] 传递给前端模板。
+        let user_like_comments_ids = [];
+        if (userInfo[0]) {
+            //查询“info_comments_like”表当前登录用户点赞过的评论对象。
+            //查询条件：user_id = 用户登陆舰的 id
+            let user_like_commentsResult = await handleDB(res, "info_comment_like", "find", "查询数据库出错！", `user_id=${userInfo[0].id}`);
+            user_like_commentsResult.forEach(el => {
+                user_like_comments_ids.push(el.comment_id);
+            })
+        }        
+
         let data = {    //把用户信息传递到模板。。
             user_info: userInfo[0] ? {
                 nick_name: userInfo[0].nick_name,
@@ -75,7 +86,8 @@ router.get('/news_detail/:news_id', (req, res) => {
             newsClick: result3,
             newsData: newsResult[0],
             isCollected,
-            commentList: commentResult
+            commentList: commentResult,
+            user_like_comments_ids
         }
         res.render("news/detail", data);
     })();
@@ -179,6 +191,49 @@ router.post('/news_detail/news_comment', (req, res) => {
         // console.log("data----------------->>>", data);
         res.send({errno: "0", errmsg: "操作成功！", data})
 
+    })();
+})
+
+//评论点赞功能。
+router.post('/news_detail/comment_like', (req, res) => {
+    (async () => {
+        // 1.获取登录用户信息，没有就 return
+        let userInfo = await common.getUser(req, res);
+        if (!userInfo[0]) {
+            res.send({erron: "4101", errmsg: "用户未登录！"});
+            return
+        }
+        // 2.获取参数，判空
+        let {comment_id, action} = req.body;
+        if (!comment_id || !action) {
+            res.send({errmsg: "参数错误！"})
+            return
+        }
+        // 3.查询数据库 判断评论是否存在，不存在就 return （要确保 comment_id 是存在的）
+        let commentResult = await handleDB(res, "info_comment", "find", "查询数据库出错！", `id=${comment_id}`);
+        if (!commentResult[0]) {
+            res.send({errmsg: "参数错误！"})
+            return
+        }
+        // console.log("comment_id---------", comment_id, action);
+        // 4.根据 action 的值，判断是点赞还是取消点赞。
+        if (action === "add") {     //执行点赞操作。
+            await handleDB(res, "info_comment_like", "insert", "数据库添加失败！", {
+                user_id: userInfo[0].id,    //点赞的用户就是这个登录的用户。
+                comment_id
+            })
+
+            var like_count = commentResult[0].like_count?commentResult[0].like_count+1:1;
+        } else {    //取消点赞操作。。
+            await handleDB(res, "info_comment_like", "delete", "数据库删除失败！", `user_id=${userInfo[0].id} and comment_id=${comment_id}`);
+
+            var like_count = commentResult[0].like_count?commentResult[0].like_count-1:0;
+        }
+        //更新数据库 info_comment 里面的 like_count 字段。
+        await handleDB(res, "info_comment", "update", "数据库更新失败！", `id=${comment_id}`,{like_count});
+
+        // 5.返回操作成功
+        res.send({errno: "0", errmsg: "操作成功！"})
     })();
 })
 module.exports = router

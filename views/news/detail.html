@@ -55,7 +55,7 @@
                     </div>
                 {{ /if }}
                 <div class="comment_time fl">{{ $value.create_time | dateFormat }}</div>
-                <a href="javascript:;" class="comment_up fr" data-commentid="{{ $value.id }}" data-newsid="{{ $value.news_id }}">赞</a>
+                <a href="javascript:;" class="{{ user_like_comments_ids.indexOf($value.id)>=0?'has_comment_up':'' }} comment_up fr" data-commentid="{{ $value.id }}" data-newsid="{{ $value.news_id }}" data-likecount="{{ $value.like_count?$value.like_count:0 }}">{{ $value.like_count?$value.like_count:"赞" }}</a>
                 <a href="javascript:;" class="comment_reply fr">回复</a>
                 <form class="reply_form fl" data-commentid="{{ $value.id }}" data-newsid="{{ $value.news_id }}">
                     <textarea class="reply_input"></textarea>
