@@ -78,6 +78,24 @@ router.get('/news_detail/:news_id', (req, res) => {
             })
         }        
 
+        //查询新闻作者的一些信息，传到模板。。
+        let authorInfo = await handleDB(res, "info_user", "find", "数据库查询失败！", `id=${newsResult[0].user_id}`);
+        // console.log("--------------newsResult[0]-", newsResult[0]);
+        // console.log("---------------", authorInfo);
+        let authorNewsCount = await handleDB(res, "info_news", "sql", "查询数据库出错！", `select count(*) from info_news where user_id=${authorInfo[0].id}`)
+        //查询作者的粉丝数量。。
+        let authorFansCount = await handleDB(res, "info_user_fans", "sql", "查询数据库出错！", `select count(*) from info_user_fans where followed_id=${authorInfo[0].id}`)
+
+        //登录的用户是不是已经关注了这作者，传一个布尔值给模板。。
+        let isFollow = false;
+        if (userInfo[0]) {  //用户是否登录。。
+            //查询数据库。
+            let followResult = await handleDB(res, "info_user_fans", "find", "查询数据库出错！", `follower_id=${userInfo[0].id} and followed_id=${authorInfo[0].id}`)
+            if (followResult[0]) {  //如果查询到值，说明用户收藏了。。
+                isFollow = true;
+            }
+        }
+
         let data = {    //把用户信息传递到模板。。
             user_info: userInfo[0] ? {
                 nick_name: userInfo[0].nick_name,
@@ -87,7 +105,11 @@ router.get('/news_detail/:news_id', (req, res) => {
             newsData: newsResult[0],
             isCollected,
             commentList: commentResult,
-            user_like_comments_ids
+            user_like_comments_ids,
+            authorInfo: authorInfo[0],
+            authorNewsCount: authorNewsCount[0]["count(*)"],
+            authorFansCount: authorFansCount[0]["count(*)"],
+            isFollow
         }
         res.render("news/detail", data);
     })();
@@ -232,6 +254,45 @@ router.post('/news_detail/comment_like', (req, res) => {
         //更新数据库 info_comment 里面的 like_count 字段。
         await handleDB(res, "info_comment", "update", "数据库更新失败！", `id=${comment_id}`,{like_count});
 
+        // 5.返回操作成功
+        res.send({errno: "0", errmsg: "操作成功！"})
+    })();
+})
+
+//点击关注功能与点击取消关注。
+router.post('/news_detail/followed_user', (req, res) => {
+    (async () => {
+        /*
+        传参：用户：user_id ，还需要一个 action 来区分是收藏还是取消。 
+        */
+        //    业务流程
+        // 1.获取登录用户信息，没有就 return
+        let userInfo = await common.getUser(req, res);
+        if (!userInfo[0]) {
+            res.send({erron: "4101", errmsg: "用户未登录！"});
+            return
+        }
+        // 2.获取参数，判空
+        let {user_id, action} = req.body;
+        if (!action || !user_id) {
+            res.send({errmsg: "参数错误！"})
+            return
+        }
+        // 3.查询数据库 判断是否存在，不存在就 return （要确保 user_id 是存在的）
+        let userResult = await handleDB(res, "info_user", "find", "查询数据库出错！", `id=${user_id}`);
+        if (!userResult[0]) {
+            res.send({errmsg: "参数错误！"})
+            return
+        }
+        // 4.根据 action 的值，判断是关注还是取消
+        if (action === "follow") {     //执行关注操作。
+            await handleDB(res, "info_user_fans", "insert", "数据库添加失败！", {
+                follower_id: userInfo[0].id,
+                followed_id: user_id
+            })
+        } else {    //取消关注操作。。
+            await handleDB(res, "info_user_fans", "delete", "数据库删除失败！", `follower_id=${userInfo[0].id} and followed_id=${user_id}`);
+        }
         // 5.返回操作成功
         res.send({errno: "0", errmsg: "操作成功！"})
     })();
