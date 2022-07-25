@@ -8,6 +8,7 @@ const common = require('./utils/common')
 const indexRouter = require('./routes/index')
 const passportRouter = require('./routes/passport')
 const detailRouter = require('./routes/detail')
+const profileRouter = require('./routes/profile')
 const keys = require('./keys')
 
 
@@ -43,7 +44,7 @@ class AppConfig{    //以面向对象的方式抽取。。推荐使用。
         this.listenPort = 3003;
 
         // 加载静态资源配置。。
-        this.app.use(express.static('public'))
+        this.app.use(express.static(path.join(__dirname, 'public')))
 
         // 模板配置。。
         this.app.engine("html", require('express-art-template'))
@@ -69,6 +70,7 @@ class AppConfig{    //以面向对象的方式抽取。。推荐使用。
         this.app.use(common.csrfProtect, indexRouter)
         this.app.use(common.csrfProtect, passportRouter)    //验证码路由。。
         this.app.use(common.csrfProtect, detailRouter)    //文章路由。。
+        this.app.use(common.csrfProtect, profileRouter)    //个人中心路由。。
 
 
         //在上面所有接口都匹配不上请求路径的时候，执行下面这个函数里面的代码。。

@@ -35,7 +35,7 @@ function getRandomString(n) {       //生成 csrf-token 的函数。。。
 }
 
 
-//获取用户信息函数。。
+//获取用户信息函数。。不一定能够获取成功，要看用户是否登录。
 async function getUser(req, res) {
     //访问首页，处理右上角用户登录显示。根据用户登录状态信息。
     //从 session 中获取 user_id 
@@ -48,6 +48,17 @@ async function getUser(req, res) {
     }
     return result;        
 }
+
+
+//获取用户信息函数。。一定可以获取成功。
+async function getUserInfo(req, res) {
+    let userInfo = await getUser(req, res);
+    if (!userInfo[0]) {     //检测是否登录。。。
+        res.redirect('/');  //没有登录进行重定向到首页。
+    }
+    return userInfo;        
+}
+
 
 //抛出404页面。
 async function abort404(req, res) {
@@ -64,5 +75,6 @@ async function abort404(req, res) {
 module.exports = {
     csrfProtect,
     getUser,
-    abort404
+    abort404,
+    getUserInfo
 }

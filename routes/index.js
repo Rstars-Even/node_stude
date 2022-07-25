@@ -3,7 +3,7 @@ const router = express.Router();
 const handleDB = require('../db/handleDB')
 require('../utils/filter')
 const common = require('../utils/common')
-
+const constant = require('../utils/constant')
 
 router.get('/', (req, res) => {
     (async () => {
@@ -25,7 +25,7 @@ router.get('/', (req, res) => {
         let data = {    //把用户信息传递到模板。。
             user_info: userInfo[0] ? {
                 nick_name: userInfo[0].nick_name,
-                avatar_url: userInfo[0].avatar_url
+                avatar_url: userInfo[0].avatar_url? (constant.AVATAR_URL_PRE + userInfo[0].avatar_url): "/news/images/worm.jpg"
             } : false,
             category: result2,
             newsClick: result3

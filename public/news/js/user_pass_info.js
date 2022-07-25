@@ -23,7 +23,6 @@ $(function () {
         }
 
         // TODO 修改密码
-        /*
         $.ajax({
             url: "/user/pass_info",
             type: "post",
@@ -36,12 +35,11 @@ $(function () {
                 if (resp.errno == "0") {
                     // 修改成功
                     alert("修改成功")
-                    window.location.reload()
+                    window.location.reload()    //只刷新子窗口内容。。
                 }else {
                     alert(resp.errmsg)
                 }
             }
         })
-        */
     })
 })

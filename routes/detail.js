@@ -3,6 +3,7 @@ const handleDB = require('../db/handleDB')
 const router = express.Router();
 require('../utils/filter')
 const common = require('../utils/common')
+const constant = require('../utils/constant')
 
 router.get('/news_detail/:news_id', (req, res) => {
     (async () => {
@@ -50,7 +51,7 @@ router.get('/news_detail/:news_id', (req, res) => {
             let commenterResult = await handleDB(res, "info_user", "find", "查询数据库出错！", `id=${commentResult[index].user_id}`);
             commentResult[index].commenter = {
                 nick_name: commenterResult[0].nick_name,
-                avatar_url: commenterResult[0].avatar_url?userInfo[0].avatar_url:"/news/images/worm.jpg"
+                avatar_url: commenterResult[0].avatar_url?(constant.AVATAR_URL_PRE + commenterResult[0].avatar_url): "/news/images/worm.jpg"
             }
 
             //如果commentResult[index].parent_id 有这个值就添加 parent 这个属性。
@@ -95,11 +96,12 @@ router.get('/news_detail/:news_id', (req, res) => {
                 isFollow = true;
             }
         }
+        authorInfo[0].avatar_url = authorInfo[0].avatar_url? (constant.AVATAR_URL_PRE + authorInfo[0].avatar_url): "/news/images/worm.jpg"
 
         let data = {    //把用户信息传递到模板。。
             user_info: userInfo[0] ? {
                 nick_name: userInfo[0].nick_name,
-                avatar_url: userInfo[0].avatar_url?userInfo[0].avatar_url:"/news/images/worm.jpg",
+                avatar_url: userInfo[0].avatar_url? (constant.AVATAR_URL_PRE + userInfo[0].avatar_url): "/news/images/worm.jpg",
             } : false,
             newsClick: result3,
             newsData: newsResult[0],
@@ -196,7 +198,7 @@ router.post('/news_detail/news_comment', (req, res) => {
         // console.log("parentComment[0]:", parentComment[0])
         let data = {
             user: {
-                avatar_url: userInfo[0].avatar_url?userInfo[0].avatar_url:"/news/images/worm.jpg",
+                avatar_url: userInfo[0].avatar_url?(constant.AVATAR_URL_PRE + userInfo[0].avatar_url):"/news/images/worm.jpg",
                 nick_name: userInfo[0].nick_name
             },
             content: comment,
