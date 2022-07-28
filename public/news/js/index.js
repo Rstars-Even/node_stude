@@ -84,15 +84,17 @@ function updateNewsData() {
             }
 
             // 显示数据
+            var time;
             for (var i=0;i<resp.newsList.length;i++) {
                 var news = resp.newsList[i]
+                time = dateFormat(news.create_time)
                 var content = '<li>'
                 content += '<a href="/news_detail/'+ news.id + '" class="news_pic fl"><img src="' + news.index_image_url + '?imageView2/1/w/170/h/170"></a>'
                 content += '<a href="/news_detail/'+ news.id + '" class="news_title fl">' + news.title + '</a>'
                 content += '<a href="/news_detail/'+ news.id + '" class="news_detail fl">' + news.digest + '</a>'
                 content += '<div class="author_info fl">'
                 content += '<div class="source fl">来源：' + news.source + '</div>'
-                content += '<div class="time fl">' + news.create_time + '</div>'
+                content += '<div class="time fl">' + time + '</div>'
                 content += '</div>'
                 content += '</li>'
                 $(".list_con").append(content);
@@ -110,4 +112,9 @@ function updateNewsData() {
         }
     })
 
+    function dateFormat(value) {
+        var d = new Date(value);
+        var tiems = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + '-' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+        return tiems
+    }
 }

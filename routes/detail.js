@@ -113,6 +113,7 @@ router.get('/news_detail/:news_id', (req, res) => {
             authorFansCount: authorFansCount[0]["count(*)"],
             isFollow
         }
+        console.log("--------------------------------", data.newsData);
         res.render("news/detail", data);
     })();
 })

@@ -57,6 +57,7 @@ router.post('/passport/register', function(req, res) {
             password_hash: md5(md5(password)+keys.password_salt),
             nick_name: username,
             last_login: new Date().toLocaleString(),
+            signature: "这个人很懒，什么都没留下。"
         })
         console.log("result2--------------------->>", result2.insertId);
         // result2.insertId; 插入数据时，自动生成这个 id 值。

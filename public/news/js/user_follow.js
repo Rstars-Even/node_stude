@@ -13,9 +13,8 @@ $(function () {
             "action": "unfollow",
             "user_id": user_id
         }
-        /*
         $.ajax({
-            url: "/news/followed_user",
+            url: "/news_detail/followed_user",
             type: "post",
             contentType: "application/json",
             headers: {
@@ -25,11 +24,11 @@ $(function () {
             success: function (resp) {
                 if (resp.errno == "0") {
                     // 取消关注成功
-                    var count = parseInt($(".follows b").news());
-                    count--;
-                    $(".follows b").news(count + "")
-                    $(".focus").show()
-                    $(".focused").hide()
+                    // var count = parseInt($(".follows b").html());
+                    // count--;
+                    // $(".follows b").html(count + "")
+                    // $(".focus").show()
+                    // $(".focused").hide()
                     window.location.reload()
                 }else if (resp.errno == "4101"){
                     // 未登录，弹出登录框
@@ -40,7 +39,5 @@ $(function () {
                 }
             }
         })
-        */
-
     })
 })

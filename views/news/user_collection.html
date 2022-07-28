@@ -13,24 +13,24 @@
     <div class="my_collect">
         <h3>我的收藏</h3>
         <ul class="article_list">
-            <li><a href="#">智能音箱“不智能”：这次轮到三星语音助手Bixby被吐槽了</a><span>2018-1-17</span></li>
-            <li><a href="#">智能音箱“不智能”：这次轮到三星语音助手Bixby被吐槽了</a><span>2018-1-17</span></li>
-            <li><a href="#">智能音箱“不智能”：这次轮到三星语音助手Bixby被吐槽了</a><span>2018-1-17</span></li>
-            <li><a href="#">智能音箱“不智能”：这次轮到三星语音助手Bixby被吐槽了</a><span>2018-1-17</span></li>
-            <li><a href="#">智能音箱“不智能”：这次轮到三星语音助手Bixby被吐槽了</a><span>2018-1-17</span></li>
-            <li><a href="#">智能音箱“不智能”：这次轮到三星语音助手Bixby被吐槽了</a><span>2018-1-17</span></li>
+            {{each collectionNewsList}}
+            <li><a href="#">{{$value.title}}</a><span>{{$value.create_time | dateFormat}}</span></li>
+            {{/each}}
         </ul>
 
-
+        <!-- <div style="display: none" class="currentPage">{{currentPage}}</div>
+        <div style="display: none" class="totalPage">{{totalPage}}</div> -->
 
         <div id="pagination" class="page"></div>
         <script>
             $(function() {
                 $("#pagination").pagination({
-                    currentPage: 2,
-                    totalPage: 3,
+                    currentPage: Number({{currentPage}}),
+                    totalPage: Number({{totalPage}}),
                     callback: function(current) {
-                        alert('ok!');
+
+                        //点击发起get请求，第 current 页的数据。
+                        location.href = "http://localhost:3003/user/collections?p="+current
                     }
                 });
             });

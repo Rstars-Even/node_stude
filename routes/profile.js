@@ -158,12 +158,92 @@ router.post('/user/pic_info', upload.single("avatar"), (req, res) => {
 router.get('/user/collections', (req, res) => {
     (async function(){
         let userInfo = await common.getUserInfo(req, res);
-        let data = {    //把用户信息传递到模板。。
-            user_info: {
-                avatar_url: userInfo[0].avatar_url? (constant.AVATAR_URL_PRE + userInfo[0].avatar_url): "/news/images/worm.jpg",
-            }
-         }
+        let {p = 1} = req.query;
+        let currentPage = p;
+        let counts = await handleDB(res, "info_user_collection", "sql", "数据库查询出错！", `select count(*) from info_user_collection where user_id=${userInfo[0].id}`)
+        let totalPage = Math.ceil(counts[0]["count(*)"]/10);
+        
+        let collectionNewsIdList = await handleDB(res, "info_user_collection", "find", "数据库查询出错！！", `user_id=${userInfo[0].id} limit ${(currentPage - 1)*10},10`);
+        let collectionNewsList = [];
+        // 通过遍历这个id数组，拿着里面每一个元素的 news_id 属性去查询 info_news 表。
+        // 把查询的每一个结果 push 到 collectionNewsList
+        for (let index = 0; index < collectionNewsIdList.length; index++) {
+            let ret = await handleDB(res, "info_news", "sql", "查询数据库出错！!!", `select title,create_time from info_news where id = ${collectionNewsIdList[index].news_id}`)
+            collectionNewsList.push(ret[0]);
+        }
+        
+        let data = {
+            currentPage,
+            totalPage,
+            collectionNewsList
+        }
+        console.log("data--------", data);
         res.render('news/user_collection', data)
     })()
 })
+
+// 我的关注页面。。
+router.get('/user/follow', (req, res) => {
+    (async function(){
+        let userInfo = await common.getUserInfo(req, res);
+        let {p = 1} = req.query;
+        let counts = await handleDB(res, "info_user_fans", "sql", "数据库查询出错！", `select count(*) from info_user_fans where follower_id=${userInfo[0].id}`)
+        let totalPage = Math.ceil(counts[0]["count(*)"]/4);         //总页数。。。
+        let currentPage = p;
+
+        let followUserIdList = await handleDB(res, "info_user_fans", "find", "数据库查询出错！！", `follower_id=${userInfo[0].id} limit ${(currentPage - 1)*4},4`);
+        let followUserList = [];
+        let authorNewsCount     //文章数量
+        let authorFansCount     //粉丝数量
+        for (let index = 0; index < followUserIdList.length; index++) {
+            // 查询关注作者的身份信息。。
+            let ret = await handleDB(res, "info_user", "sql", "查询数据库出错！!!", `select id,nick_name,avatar_url,signature from info_user where id = ${followUserIdList[index].followed_id}`)
+            //查询关注作者写的文章数量。。
+            authorNewsCount = await handleDB(res, "info_news", "sql", "查询数据库出错！", `select count(*) from info_news where user_id=${followUserIdList[index].followed_id}`)
+            //查询关注作者的粉丝数量。。
+            authorFansCount = await handleDB(res, "info_user_fans", "sql", "查询数据库出错！", `select count(*) from info_user_fans where followed_id=${followUserIdList[index].followed_id}`)
+            
+            ret[0].authorNewsCount = authorNewsCount[0]["count(*)"]
+            ret[0].authorFansCount = authorFansCount[0]["count(*)"]
+            followUserList.push(ret[0]);
+
+
+        }
+        for (let i = 0; i < followUserList.length; i++) {       //处理头像地址。。。
+            followUserList[i].avatar_url = followUserList[i].avatar_url? (constant.AVATAR_URL_PRE + followUserList[i].avatar_url): "/news/images/worm.jpg"
+        }
+
+        let data = {
+            currentPage,
+            totalPage,
+            followUserList
+        }
+        console.log("data--------", data);
+        res.render('news/user_follow', data);
+    })()
+})
+
+// 新闻发布显示页面。。
+router.get('/user/news_release', (req, res) => {
+    (async function(){
+        let userInfo = await common.getUserInfo(req, res);
+        res.render('news/user_news_release')
+    })()
+})
+// 新闻发布提交接口。。
+// router.post('/user/news_release', (req, res) => {
+//     (async function(){
+//         let userInfo = await common.getUserInfo(req, res);
+//         console.log("---------------------------", req.body);
+//     })()
+// })
+
+// 新闻列表页面。。
+router.get('/user/news_list', (req, res) => {
+    (async function(){
+        let userInfo = await common.getUserInfo(req, res);
+        res.render('news/user_news_list')
+    })()
+})
+
 module.exports = router
